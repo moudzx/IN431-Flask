@@ -1,0 +1,141 @@
+$ python api_client.py GET /api/health
+HTTP 200
+Content-Type: application/json
+X-Request-ID: b7179dd2f21e453285f76b890bedb184
+{
+  "service": "advanced-web-api",
+  "status": "ok"
+}
+
+$ python api_client.py GET /api/tasks
+HTTP 200
+Content-Type: application/json
+X-Request-ID: a859e407eb734e119f09b6a6f3cf89b2
+[
+  {
+    "done": false,
+    "id": 1,
+    "title": "Prepare lab"
+  },
+  {
+    "done": true,
+    "id": 2,
+    "title": "Review REST notes"
+  },
+  {
+    "done": false,
+    "id": 3,
+    "title": "Test Flask routes"
+  }
+]
+
+$ python api_client.py POST /api/tasks --json payloads/create.json
+HTTP 201
+Content-Type: application/json
+Location: /api/tasks/4
+X-Request-ID: 0441e236b2af4c64bee3808086a4a924
+{
+  "done": false,
+  "id": 4,
+  "title": "Prepare project proposal"
+}
+
+$ python api_client.py GET /api/tasks/4
+HTTP 200
+Content-Type: application/json
+X-Request-ID: 5af1915d59684d308950bcbf9e712aac
+{
+  "done": false,
+  "id": 4,
+  "title": "Prepare project proposal"
+}
+
+$ python api_client.py POST /api/tasks --json payloads/invalid_title.json
+HTTP 400
+Content-Type: application/json
+X-Request-ID: c08cf82e49534a1ba322bb56a6ff9e4a
+{
+  "error": {
+    "code": "validation_error",
+    "fields": {
+      "title": "Title must be a string"
+    },
+    "message": "Invalid task data"
+  }
+}
+
+$ python api_client.py PATCH /api/tasks/4 --json payloads/complete.json
+HTTP 200
+Content-Type: application/json
+X-Request-ID: 0e2c0808a8024c4db26aa46fdffc6f2e
+{
+  "done": true,
+  "id": 4,
+  "title": "Prepare project proposal"
+}
+
+$ python api_client.py GET /api/tasks/4
+HTTP 200
+Content-Type: application/json
+X-Request-ID: ad94a78de3444b8891c78438781b2a0d
+{
+  "done": true,
+  "id": 4,
+  "title": "Prepare project proposal"
+}
+
+$ python api_client.py PATCH /api/tasks/4 --json payloads/invalid_mixed.json
+HTTP 400
+Content-Type: application/json
+X-Request-ID: e83aff428a274ff2ba02b14261e46534
+{
+  "error": {
+    "code": "validation_error",
+    "fields": {
+      "done": "Done must be a JSON boolean"
+    },
+    "message": "Invalid task data"
+  }
+}
+
+$ python api_client.py GET /api/tasks/4
+HTTP 200
+Content-Type: application/json
+X-Request-ID: f1b405b9db8a40c58384ec0dadf8e14e
+{
+  "done": true,
+  "id": 4,
+  "title": "Prepare project proposal"
+}
+
+$ python api_client.py DELETE /api/tasks/4
+HTTP 204
+Content-Type: text/html; charset=utf-8
+X-Request-ID: 50fd207f79d34bd2954fdc511539ddf0
+<empty body>
+
+$ python api_client.py GET /api/tasks/4
+HTTP 404
+Content-Type: application/json
+X-Request-ID: 25a48e669fa0404793bc24b7d33a00a6
+{
+  "error": {
+    "code": "not_found",
+    "fields": {},
+    "message": "Task not found"
+  }
+}
+
+$ python api_client.py PUT /api/tasks/1 --json payloads/create.json
+HTTP 405
+Content-Type: application/json
+Allow: DELETE, PATCH, OPTIONS, HEAD, GET
+X-Request-ID: 592d3faad07144318f49d525d4557fc5
+{
+  "error": {
+    "code": "method_not_allowed",
+    "fields": {},
+    "message": "Method not allowed for this route"
+  }
+}
+

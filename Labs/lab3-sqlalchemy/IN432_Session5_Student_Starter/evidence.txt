@@ -1,0 +1,347 @@
+### Schema setup
+$ flask init-db
+Initial schema version: 1
+Database file: /home/claude/solved/lab3/instance/task_manager.db
+$ flask upgrade-db --to 2
+Schema version: 2
+Database file: /home/claude/solved/lab3/instance/task_manager.db
+Backup: /home/claude/solved/lab3/instance/backups/task_manager.v1.before-v2.20261103T084400.f02a29.db
+$ flask upgrade-db --to 3
+Schema version: 3
+Database file: /home/claude/solved/lab3/instance/task_manager.db
+Backup: /home/claude/solved/lab3/instance/backups/task_manager.v2.before-v3.20261103T084401.8895d1.db
+$ flask upgrade-db --to 4
+Schema version: 4
+Database file: /home/claude/solved/lab3/instance/task_manager.db
+Backup: /home/claude/solved/lab3/instance/backups/task_manager.v3.before-v4.20261103T084402.1d4bac.db
+$ flask db-info
+Database file: /home/claude/solved/lab3/instance/task_manager.db
+Schema version: 4
+Foreign keys: 1
+tasks: 0 rows
+projects: 0 rows
+project_details: 0 rows
+tags: 0 rows
+task_tags: 0 rows
+
+### API workflow
+$ python api_client.py GET /api/health
+HTTP 200
+Content-Type: application/json
+{
+  "app": "task_manager",
+  "session": 5,
+  "status": "ok"
+}
+
+$ python api_client.py POST /api/tasks --json payloads/task.json
+HTTP 201
+Content-Type: application/json
+Location: /api/tasks/1
+{
+  "done": false,
+  "id": 1,
+  "project_id": null,
+  "tag_ids": [],
+  "title": "Prepare project proposal"
+}
+
+$ python api_client.py POST /api/tasks --json payloads/second_task.json
+HTTP 201
+Content-Type: application/json
+Location: /api/tasks/2
+{
+  "done": false,
+  "id": 2,
+  "project_id": null,
+  "tag_ids": [],
+  "title": "Prepare the database diagram"
+}
+
+$ python api_client.py GET /api/tasks
+HTTP 200
+Content-Type: application/json
+[
+  {
+    "done": false,
+    "id": 1,
+    "project_id": null,
+    "tag_ids": [],
+    "title": "Prepare project proposal"
+  },
+  {
+    "done": false,
+    "id": 2,
+    "project_id": null,
+    "tag_ids": [],
+    "title": "Prepare the database diagram"
+  }
+]
+
+$ python api_client.py PATCH /api/tasks/1 --json payloads/complete.json
+HTTP 200
+Content-Type: application/json
+{
+  "done": true,
+  "id": 1,
+  "project_id": null,
+  "tag_ids": [],
+  "title": "Prepare project proposal"
+}
+
+$ python api_client.py PATCH /api/tasks/1 --json payloads/reopen.json
+HTTP 200
+Content-Type: application/json
+{
+  "done": false,
+  "id": 1,
+  "project_id": null,
+  "tag_ids": [],
+  "title": "Prepare project proposal"
+}
+
+$ python api_client.py PATCH /api/tasks/1 --json payloads/invalid_mixed.json
+HTTP 400
+Content-Type: application/json
+{
+  "error": {
+    "code": "validation_error",
+    "fields": {
+      "done": "Done must be a JSON boolean"
+    },
+    "message": "Invalid task data"
+  }
+}
+
+$ python api_client.py GET /api/tasks/1
+HTTP 200
+Content-Type: application/json
+{
+  "done": false,
+  "id": 1,
+  "project_id": null,
+  "tag_ids": [],
+  "title": "Prepare project proposal"
+}
+
+$ python api_client.py POST /api/projects --json payloads/project.json
+HTTP 201
+Content-Type: application/json
+Location: /api/projects/1
+{
+  "id": 1,
+  "name": "IN432 Coursework"
+}
+
+$ python api_client.py PUT /api/tasks/1/project --json payloads/assign_project.json
+HTTP 200
+Content-Type: application/json
+{
+  "done": false,
+  "id": 1,
+  "project_id": 1,
+  "tag_ids": [],
+  "title": "Prepare project proposal"
+}
+
+$ python api_client.py GET /api/projects/1
+HTTP 200
+Content-Type: application/json
+{
+  "details": null,
+  "id": 1,
+  "name": "IN432 Coursework",
+  "task_ids": [
+    1
+  ]
+}
+
+$ python api_client.py POST /api/projects --json payloads/empty_project.json
+HTTP 201
+Content-Type: application/json
+Location: /api/projects/2
+{
+  "id": 2,
+  "name": "Future Ideas"
+}
+
+$ python api_client.py PUT /api/projects/1/details --json payloads/details.json
+HTTP 201
+Content-Type: application/json
+{
+  "description": "Backend and database exercises",
+  "id": 1,
+  "project_id": 1
+}
+
+$ python api_client.py PUT /api/projects/1/details --json payloads/details_update.json
+HTTP 200
+Content-Type: application/json
+{
+  "description": "Backend, relationships and reports",
+  "id": 1,
+  "project_id": 1
+}
+
+$ python api_client.py POST /api/tags --json payloads/tag.json
+HTTP 201
+Content-Type: application/json
+{
+  "id": 1,
+  "name": "database"
+}
+
+$ python api_client.py POST /api/tags --json payloads/second_tag.json
+HTTP 201
+Content-Type: application/json
+{
+  "id": 2,
+  "name": "urgent"
+}
+
+$ python api_client.py PUT /api/tasks/1/tags/1
+HTTP 200
+Content-Type: application/json
+{
+  "done": false,
+  "id": 1,
+  "project_id": 1,
+  "tag_ids": [
+    1
+  ],
+  "title": "Prepare project proposal"
+}
+
+$ python api_client.py PUT /api/tasks/2/tags/1
+HTTP 200
+Content-Type: application/json
+{
+  "done": false,
+  "id": 2,
+  "project_id": null,
+  "tag_ids": [
+    1
+  ],
+  "title": "Prepare the database diagram"
+}
+
+$ python api_client.py DELETE /api/tasks/1/tags/1
+HTTP 204
+Content-Type: text/html; charset=utf-8
+<empty body>
+
+$ python api_client.py GET /api/reports/tasks-with-projects
+HTTP 200
+Content-Type: application/json
+[
+  {
+    "id": 1,
+    "project_name": "IN432 Coursework",
+    "title": "Prepare project proposal"
+  },
+  {
+    "id": 2,
+    "project_name": null,
+    "title": "Prepare the database diagram"
+  }
+]
+
+$ python api_client.py GET /api/reports/project-counts
+HTTP 200
+Content-Type: application/json
+[
+  {
+    "id": 1,
+    "name": "IN432 Coursework",
+    "task_count": 1
+  },
+  {
+    "id": 2,
+    "name": "Future Ideas",
+    "task_count": 0
+  }
+]
+
+$ python api_client.py POST /api/project-bundles --json payloads/bundle.json
+HTTP 201
+Content-Type: application/json
+Location: /api/projects/3
+{
+  "details": {
+    "description": "Created as one unit",
+    "id": 2,
+    "project_id": 3
+  },
+  "id": 3,
+  "name": "Team Deliverable",
+  "task_ids": [
+    3,
+    4
+  ]
+}
+
+$ python api_client.py POST /api/project-bundles --json payloads/invalid_bundle.json
+HTTP 400
+Content-Type: application/json
+{
+  "error": {
+    "code": "validation_error",
+    "fields": {
+      "title": "Use 3 to 120 characters after trimming"
+    },
+    "message": "Invalid task data"
+  }
+}
+
+$ python api_client.py PUT /api/tasks/1/project --json payloads/unassign_project.json
+HTTP 200
+Content-Type: application/json
+{
+  "done": false,
+  "id": 1,
+  "project_id": null,
+  "tag_ids": [],
+  "title": "Prepare project proposal"
+}
+
+$ python api_client.py DELETE /api/projects/1
+HTTP 204
+Content-Type: text/html; charset=utf-8
+<empty body>
+
+$ python api_client.py GET /api/tasks
+HTTP 200
+Content-Type: application/json
+[
+  {
+    "done": false,
+    "id": 1,
+    "project_id": null,
+    "tag_ids": [],
+    "title": "Prepare project proposal"
+  },
+  {
+    "done": false,
+    "id": 2,
+    "project_id": null,
+    "tag_ids": [
+      1
+    ],
+    "title": "Prepare the database diagram"
+  },
+  {
+    "done": false,
+    "id": 3,
+    "project_id": 3,
+    "tag_ids": [],
+    "title": "Design the API"
+  },
+  {
+    "done": false,
+    "id": 4,
+    "project_id": 3,
+    "tag_ids": [],
+    "title": "Implement the models"
+  }
+]
+

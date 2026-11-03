@@ -1,0 +1,37 @@
+PASS trim the title
+PASS retain False
+PASS reject numeric title
+PASS reject a short title
+PASS reject string boolean
+PASS reject integer boolean
+PASS require title on creation
+PASS reject empty partial update
+PASS reject client id
+PASS reject nonobject body
+Validation checks passed: 10 / 10
+
+test_collection_and_item (__main__.BaselineChecks.test_collection_and_item) ... ok
+test_health (__main__.BaselineChecks.test_health) ... ok
+test_method_error_preserves_allow (__main__.BaselineChecks.test_method_error_preserves_allow) ... ok
+test_missing_resource_and_route (__main__.BaselineChecks.test_missing_resource_and_route) ... ok
+test_bad_json_and_media_type (__main__.WriteChecks.test_bad_json_and_media_type) ... ok
+test_create_location_and_default (__main__.WriteChecks.test_create_location_and_default) ... ok
+test_create_with_done (__main__.WriteChecks.test_create_with_done) ... ok
+test_delete_empty_body_then_missing (__main__.WriteChecks.test_delete_empty_body_then_missing) ... ok
+test_deleted_ids_are_not_reused (__main__.WriteChecks.test_deleted_ids_are_not_reused) ... ok
+test_empty_json_body (__main__.WriteChecks.test_empty_json_body) ... ok
+test_missing_patch_target (__main__.WriteChecks.test_missing_patch_target) ... ok
+test_new_app_has_fresh_store (__main__.WriteChecks.test_new_app_has_fresh_store) ... ok
+test_patch_false_is_a_valid_value (__main__.WriteChecks.test_patch_false_is_a_valid_value) ... ok
+test_patch_invalid_fields_leave_all_data_unchanged (__main__.WriteChecks.test_patch_invalid_fields_leave_all_data_unchanged) ... ok
+test_patch_keeps_omitted_fields (__main__.WriteChecks.test_patch_keeps_omitted_fields) ... ok
+test_patch_normalisation_and_both_fields (__main__.WriteChecks.test_patch_normalisation_and_both_fields) ... ok
+test_patch_retry_has_same_final_state (__main__.WriteChecks.test_patch_retry_has_same_final_state) ... ok
+test_rejected_create_leaves_collection_unchanged (__main__.WriteChecks.test_rejected_create_leaves_collection_unchanged) ... ok
+test_title_boundaries (__main__.WriteChecks.test_title_boundaries) ... ok
+test_unique_ids_and_repeated_post (__main__.WriteChecks.test_unique_ids_and_repeated_post) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.086s
+
+OK

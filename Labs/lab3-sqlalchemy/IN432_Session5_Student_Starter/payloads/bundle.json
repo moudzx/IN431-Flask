@@ -1,0 +1,12 @@
+{
+  "name": "Team Deliverable",
+  "description": "Created as one unit",
+  "tasks": [
+    {
+      "title": "Design the API"
+    },
+    {
+      "title": "Implement the models"
+    }
+  ]
+}

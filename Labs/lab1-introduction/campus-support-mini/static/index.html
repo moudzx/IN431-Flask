@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Campus Support Mini</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; font-size: 20px; margin: 0; }
+    main { max-width: 42rem; margin: auto; padding: 1.5rem; }
+    form { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    select, button { font: inherit; padding: 0.5rem; }
+    li { padding-block: 0.4rem; }
+    button:disabled { opacity: 0.6; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Campus Support Mini</h1>
+    <p>Fictional tickets for the IN432 workshop.</p>
+    <form id="filters">
+      <label for="status">Ticket status</label>
+      <select id="status" name="status">
+        <option value="">All statuses</option>
+        <option value="OPEN">Open</option>
+        <option value="RESOLVED">Resolved</option>
+      </select>
+      <button id="load" type="submit">Load tickets</button>
+    </form>
+    <p id="feedback" role="status" aria-live="polite">
+      Choose a status and load the records.
+    </p>
+    <ul id="ticket-list"></ul>
+  </main>
+  <script>
+    const form = document.querySelector("#filters");
+    const select = document.querySelector("#status");
+    const button = document.querySelector("#load");
+    const list = document.querySelector("#ticket-list");
+    const feedback = document.querySelector("#feedback");
+
+    function renderTickets(items) {
+      list.replaceChildren();
+      for (const ticket of items) {
+        const li = document.createElement("li");
+        li.textContent = `${ticket.title} (${ticket.status})`;
+        list.append(li);
+      }
+    }
+
+    async function loadTickets() {
+      button.disabled = true;
+      list.replaceChildren();
+      feedback.textContent = "Loading...";
+      try {
+        const status = select.value;
+        const query = status ? "?status=" + encodeURIComponent(status) : "";
+        const response = await fetch("/api/tickets" + query, {
+          headers: { Accept: "application/json" }
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const data = await response.json();
+        renderTickets(data.items);
+        feedback.textContent = `Loaded ${data.count} ticket(s).`;
+      } catch (error) {
+        feedback.textContent = `Could not load tickets: ${error.message}`;
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      loadTickets();
+    });
+  </script>
+</body>
+</html>
