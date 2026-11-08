@@ -1,0 +1,12 @@
+{
+  "name": "Rejected Deliverable",
+  "description": "Must not be stored",
+  "tasks": [
+    {
+      "title": "Valid first task"
+    },
+    {
+      "title": "x"
+    }
+  ]
+}
